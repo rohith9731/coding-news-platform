@@ -1,0 +1,106 @@
+<%- include('partials/header') %>
+
+    <!-- Hero Section -->
+    <section class="mb-16 text-center">
+        <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
+            The Latest in <span class="gradient-text">Code</span>.
+        </h1>
+        <p class="mb-8 text-lg font-normal text-gray-400 lg:text-xl sm:px-16 xl:px-48">
+            Stay ahead of the curve with breaking news, in-depth analysis, and expert tutorials for modern developers.
+        </p>
+        <div class="flex flex-col mb-8 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
+            <a href="#"
+                class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-gradient-to-r from-blue-600 to-violet-600 hover:opacity-90 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900 shadow-lg shadow-blue-500/30 transition-transform hover:scale-105">
+                Read Latest
+                <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 14 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M1 5h12m0 0L9 1m4 4L9 9" />
+                </svg>
+            </a>
+            <a href="#"
+                class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg border border-gray-600 hover:bg-gray-800 focus:ring-4 focus:ring-gray-700 transition-colors">
+                Subscribe
+            </a>
+        </div>
+    </section>
+
+    <!-- News Grid -->
+    <section>
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-3xl font-bold text-white">Trending Now</h2>
+            <a href="#" class="text-blue-400 hover:text-blue-300 transition flex items-center">View all <span
+                    class="ml-1 text-xl">&rarr;</span></a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <% articles.forEach(function(article) { %>
+                <div
+                    class="glass-card rounded-2xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 flex flex-col">
+                    <div class="h-48 overflow-hidden relative group">
+                        <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            src="<%= article.image %>" alt="<%= article.title %>">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+                        <div class="absolute bottom-3 left-3 flex space-x-2">
+                            <% article.tags.forEach(function(tag) { %>
+                                <span
+                                    class="bg-blue-600/80 backdrop-blur-sm text-blue-100 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-500/30">
+                                    <%= tag %>
+                                </span>
+                                <% }); %>
+                        </div>
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col">
+                        <div class="flex items-center text-sm text-gray-300 mb-3">
+                            <span class="mr-2">
+                                <%= article.author %>
+                            </span> • <span class="ml-2">
+                                <%= article.date %>
+                            </span>
+                        </div>
+                        <!-- ... -->
+                        <a href="/article/<%= article.id %>">
+                            <h5
+                                class="mb-2 text-2xl font-bold tracking-tight text-white hover:text-blue-400 transition-colors">
+                                <%= article.title %>
+                            </h5>
+                        </a>
+                        <p class="mb-4 font-normal text-gray-300 flex-grow text-sm line-clamp-3">
+                            <%= article.summary %>
+                        </p>
+                        <a href="/article/<%= article.id %>"
+                            class="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors font-medium">
+                            Read Article
+                            <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <% }); %>
+        </div>
+        <!-- Feedback Section -->
+        <section class="mt-16 bg-slate-800/50 p-8 rounded-2xl border border-slate-700 text-center">
+            <h2 class="text-2xl font-bold text-white mb-4">We value your feedback</h2>
+            <p class="text-gray-400 mb-6">Help us improve DevNews by sharing your thoughts.</p>
+
+            <% if (locals.feedbackSuccess) { %>
+                <div class="bg-green-900/50 text-green-200 p-4 rounded mb-4 inline-block">Thank you for your feedback!
+                </div>
+                <% } %>
+
+                    <form action="/feedback" method="POST" class="max-w-lg mx-auto">
+                        <textarea name="message" rows="3"
+                            class="w-full bg-slate-900 text-white rounded-lg border border-slate-600 p-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none mb-4"
+                            placeholder="Tell us what you think..." required></textarea>
+                        <button type="submit"
+                            class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-2 px-8 rounded-full hover:shadow-lg hover:shadow-blue-500/30 transition-all transform hover:-translate-y-1">Send
+                            Feedback</button>
+                    </form>
+        </section>
+
+    </section>
+
+    <%- include('partials/footer') %>

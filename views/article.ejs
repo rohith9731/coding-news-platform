@@ -1,0 +1,180 @@
+<%- include('partials/header') %>
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6 text-gray-300" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="/" class="inline-flex items-center text-sm font-medium hover:text-white">
+                        <svg class="w-3 h-3 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
+                        </svg>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 6 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 9 4-4-4-4" />
+                        </svg>
+                        <span class="ms-1 text-sm font-medium text-gray-400 md:ms-2 dark:text-gray-300">Articles</span>
+                    </div>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 6 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 9 4-4-4-4" />
+                        </svg>
+                        <span class="ms-1 text-sm font-medium text-white md:ms-2">
+                            <%= article.id %>
+                        </span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="mb-8">
+            <div class="flex flex-wrap gap-2 mb-4">
+                <% article.tags.forEach(function(tag) { %>
+                    <span
+                        class="bg-blue-900/50 text-blue-300 text-xs font-semibold px-2.5 py-0.5 rounded border border-blue-800">
+                        <%= tag %>
+                    </span>
+                    <% }); %>
+            </div>
+            <h1 class="mb-4 text-3xl font-extrabold leading-tight text-white lg:mb-6 lg:text-5xl">
+                <%= article.title %>
+            </h1>
+            <div class="flex items-center justify-between border-b border-gray-700 pb-6">
+                <div class="flex items-center space-x-3">
+                    <div
+                        class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg">
+                        <%= article.author.charAt(0) %>
+                    </div>
+                    <div>
+                        <div class="text-white font-medium">
+                            <%= article.author %>
+                        </div>
+                        <div class="text-gray-400 text-sm">
+                            <%= article.date %>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="text-gray-400 hover:text-white transition">
+                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                            viewBox="0 0 24 24">
+                            <path fill-rule="evenodd"
+                                d="M13.795 10.533 20.68 2h-3.073l-5.255 6.517L7.69 2H1l7.806 10.91L1.47 22h3.074l5.705-7.07L15.31 22H22l-8.205-11.467Zm-2.38 2.95L9.97 11.464 3.3 2.112h2.22l5.353 7.525 1.444 1.94 7.23 10.12h-2.22l-5.912-8.214Z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Featured Image -->
+        <figure class="mb-10 shadow-2xl shadow-blue-900/20 rounded-xl overflow-hidden">
+            <img class="w-full object-cover max-h-[500px]" src="<%= article.image %>" alt="<%= article.title %>">
+        </figure>
+
+        <!-- Article Content -->
+        <article class="prose prose-lg prose-invert max-w-none mb-12">
+            <p
+                class="lead text-xl text-gray-200 mb-6 font-light border-l-4 border-blue-500 pl-4 bg-slate-900/50 p-4 rounded-r-lg">
+                <%= article.summary %>
+            </p>
+
+            <div class="text-gray-100 space-y-6">
+                <%- article.content %>
+            </div>
+        </article>
+
+        <hr class="border-gray-700 mb-12">
+
+        <!-- Review Section -->
+        <section class="bg-gray-800/50 rounded-xl p-8 backdrop-blur-sm border border-gray-700 mb-8">
+            <h3 class="text-2xl font-bold text-white mb-6">Reviews</h3>
+
+            <% if (locals.reviews && reviews.length> 0) { %>
+                <div class="space-y-6 mb-8">
+                    <% reviews.forEach(review=> { %>
+                        <div class="border-b border-gray-700 pb-4 last:border-0">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-blue-400">
+                                    <%= review.user.username %>
+                                </span>
+                                <div class="flex text-yellow-500">
+                                    <% for(let i=0; i<review.rating; i++) { %>★<% } %>
+                                            <% for(let i=review.rating; i<5; i++) { %>☆<% } %>
+                                </div>
+                            </div>
+                            <p class="text-gray-300">
+                                <%= review.comment %>
+                            </p>
+                            <span class="text-xs text-gray-500 mt-1 block">
+                                <%= new Date(review.createdAt).toLocaleDateString() %>
+                            </span>
+                        </div>
+                        <% }) %>
+                </div>
+                <% } else { %>
+                    <p class="text-gray-400 mb-8 italic">No reviews yet. Be the first to review!</p>
+                    <% } %>
+
+                        <% if (locals.user) { %>
+                            <form action="/article/<%= article.id %>/review" method="POST"
+                                class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                                <h4 class="text-lg font-semibold text-white mb-4">Leave a Review</h4>
+                                <div class="mb-4">
+                                    <label class="block text-gray-400 text-sm font-bold mb-2">Rating</label>
+                                    <select name="rating"
+                                        class="bg-gray-700 text-white rounded p-2 w-full border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                                        <option value="5">5 - Excellent</option>
+                                        <option value="4">4 - Very Good</option>
+                                        <option value="3">3 - Good</option>
+                                        <option value="2">2 - Fair</option>
+                                        <option value="1">1 - Poor</option>
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-400 text-sm font-bold mb-2">Comment</label>
+                                    <textarea name="comment" rows="3"
+                                        class="bg-gray-700 text-white rounded p-2 w-full border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                        required></textarea>
+                                </div>
+                                <button type="submit"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition-colors">Submit
+                                    Review</button>
+                            </form>
+                            <% } else { %>
+                                <div
+                                    class="bg-blue-900/30 border border-blue-500/30 text-blue-200 p-4 rounded text-center">
+                                    Please <a href="/auth/login" class="underline hover:text-white">login</a> to leave a
+                                    review.
+                                </div>
+                                <% } %>
+        </section>
+
+        <!-- Navigation -->
+        <div class="mt-12 flex justify-between border-t border-gray-700 pt-6">
+            <a href="/" class="text-blue-400 hover:text-white transition flex items-center">
+                <svg class="w-4 h-4 mr-2 rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 14 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M1 5h12m0 0L9 1m4 4L9 9" />
+                </svg>
+                Back to Home
+            </a>
+        </div>
+
+    </div>
+
+    <%- include('partials/footer') %>
