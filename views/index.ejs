@@ -1,15 +1,162 @@
 <%- include('partials/header') %>
 
+    <!-- 🍌 Banana Entrance Animation Overlay -->
+    <div id="banana-overlay" class="fixed inset-0 z-[200] pointer-events-none overflow-hidden"
+        style="background:transparent;">
+        <canvas id="banana-canvas" class="absolute inset-0 w-full h-full"></canvas>
+    </div>
+
+    <style>
+        /* === Layout: Sidebar + Content === */
+        .page-layout {
+            display: flex;
+            min-height: calc(100vh - 7rem);
+            align-items: flex-start;
+        }
+
+        /* Fixed Left Dashboard */
+        #dashboard-sidebar {
+            position: sticky;
+            top: 5.5rem;
+            width: 240px;
+            min-width: 240px;
+            flex-shrink: 0;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 1rem;
+            overflow-y: auto;
+            max-height: calc(100vh - 7rem);
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.08);
+            margin-right: 2rem;
+            transition: all 0.3s ease;
+            scrollbar-width: none;
+        }
+
+        #dashboard-sidebar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .main-content-area {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Dashboard nav items */
+        .dash-link {
+            display: flex;
+            align-items: center;
+            padding: 0.6rem 0.75rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            gap: 0.6rem;
+            text-decoration: none;
+        }
+
+        .dash-link:hover {
+            background: rgba(99, 102, 241, 0.12);
+            color: #ffffff;
+        }
+
+        .dash-link.active {
+            background: linear-gradient(to right, rgba(37, 99, 235, 0.3), rgba(99, 102, 241, 0.2));
+            color: #ffffff;
+            border-left: 2px solid #6366f1;
+        }
+
+        .dash-link svg {
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Hero section entrance animation */
+        .hero-section {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: heroSlideIn 0.7s ease forwards 1.8s;
+        }
+
+        @keyframes heroSlideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Sidebar entrance animation */
+        #dashboard-sidebar {
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: sidebarSlideIn 0.6s ease forwards 2.1s;
+        }
+
+        @keyframes sidebarSlideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Cards entrance */
+        .article-card {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: cardFadeIn 0.5s ease forwards;
+        }
+
+        @keyframes cardFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive: hide sidebar on mobile, show toggle */
+        @media (max-width: 900px) {
+            #dashboard-sidebar {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                width: 240px;
+                max-height: 100vh;
+                border-radius: 0;
+                z-index: 60;
+                transform: translateX(-100%);
+                opacity: 1 !important;
+            }
+
+            #dashboard-sidebar.open {
+                transform: translateX(0) !important;
+                animation: none !important;
+            }
+
+            .page-layout {
+                display: block;
+            }
+
+            #sidebar-overlay {
+                display: none;
+            }
+
+            #sidebar-overlay.visible {
+                display: block;
+            }
+        }
+    </style>
+
     <!-- Hero Section -->
-    <section class="mb-16 text-center">
+    <section class="mb-12 text-center hero-section">
         <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
             The Latest in <span class="gradient-text">Code</span>.
         </h1>
         <p class="mb-8 text-lg font-normal text-gray-400 lg:text-xl sm:px-16 xl:px-48">
             Stay ahead of the curve with breaking news, in-depth analysis, and expert tutorials for modern developers.
         </p>
-        <div class="flex flex-col mb-8 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
-            <a href="#"
+        <div class="flex flex-col mb-4 lg:mb-8 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
+            <a href="/trends"
                 class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-gradient-to-r from-blue-600 to-violet-600 hover:opacity-90 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900 shadow-lg shadow-blue-500/30 transition-transform hover:scale-105">
                 Read Latest
                 <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -18,89 +165,404 @@
                         d="M1 5h12m0 0L9 1m4 4L9 9" />
                 </svg>
             </a>
-            <a href="#"
-                class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg border border-gray-600 hover:bg-gray-800 focus:ring-4 focus:ring-gray-700 transition-colors">
-                Subscribe
-            </a>
+            <% if (locals.user) { %>
+                <button
+                    onclick="alert('Thanks for subscribing! You will receive notifications for the latest articles.');"
+                    class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg border border-gray-600 hover:bg-gray-800 focus:ring-4 focus:ring-gray-700 transition-colors">
+                    Subscribe
+                </button>
+                <% } else { %>
+                    <a href="/auth/login"
+                        class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg border border-gray-600 hover:bg-gray-800 focus:ring-4 focus:ring-gray-700 transition-colors">
+                        Subscribe
+                    </a>
+                    <% } %>
         </div>
     </section>
 
-    <!-- News Grid -->
-    <section>
-        <div class="flex items-center justify-between mb-8">
-            <h2 class="text-3xl font-bold text-white">Trending Now</h2>
-            <a href="#" class="text-blue-400 hover:text-blue-300 transition flex items-center">View all <span
-                    class="ml-1 text-xl">&rarr;</span></a>
-        </div>
+    <!-- Mobile sidebar overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm hidden" onclick="closeSidebar()">
+    </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <% articles.forEach(function(article) { %>
-                <div
-                    class="glass-card rounded-2xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 flex flex-col">
-                    <div class="h-48 overflow-hidden relative group">
-                        <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                            src="<%= article.image %>" alt="<%= article.title %>">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                        <div class="absolute bottom-3 left-3 flex space-x-2">
-                            <% article.tags.forEach(function(tag) { %>
-                                <span
-                                    class="bg-blue-600/80 backdrop-blur-sm text-blue-100 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-500/30">
-                                    <%= tag %>
+    <!-- Page Layout: Sidebar Left + Main Content -->
+    <div class="page-layout">
+
+        <!-- ===== LEFT DASHBOARD SIDEBAR ===== -->
+        <aside id="dashboard-sidebar">
+            <div class="p-4">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-700/50">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                            </path>
+                        </svg>
+                        Dashboard
+                    </h3>
+                    <!-- Mobile close btn -->
+                    <button onclick="closeSidebar()" class="md:hidden text-gray-500 hover:text-white p-1 rounded">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Categories -->
+                <p class="text-xs text-gray-500 uppercase tracking-widest mb-2 px-1">Categories</p>
+                <nav class="space-y-0.5">
+                    <% const categories=[ { id: 'all' , name: 'All News' , count: locals.articleCounts.all || 0,
+                        icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z'
+                        , color: 'text-indigo-400' }, { id: 'machine-learning' , name: 'Machine Learning' , count:
+                        locals.articleCounts['machine-learning'] || 0,
+                        icon: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'
+                        , color: 'text-green-400' }, { id: 'full-stack' , name: 'Full Stack' , count:
+                        locals.articleCounts['full-stack'] || 0, icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' ,
+                        color: 'text-blue-400' }, { id: 'gen-ai' , name: 'Generative AI' , count:
+                        locals.articleCounts['gen-ai'] || 0, icon: 'M13 10V3L4 14h7v7l9-11h-7z' ,
+                        color: 'text-purple-400' }, { id: 'python' , name: 'Python' , count: locals.articleCounts.python
+                        || 0, icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' ,
+                        color: 'text-yellow-400' }, { id: 'webdev' , name: 'Web Dev' , count:
+                        locals.articleCounts.webdev || 0,
+                        icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9'
+                        , color: 'text-orange-400' }, { id: 'startups' , name: 'Startups' , count:
+                        locals.articleCounts.startups || 0,
+                        icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' , color: 'text-pink-400' }, {
+                        id: 'devops' , name: 'DevOps' , count: locals.articleCounts.devops || 0,
+                        icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' , color: 'text-red-400' }, { id: 'cloud' ,
+                        name: 'Cloud Computing' , count: locals.articleCounts.cloud || 0,
+                        icon: 'M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z'
+                        , color: 'text-cyan-400' }, { id: 'react' , name: 'React' , count: locals.articleCounts.react ||
+                        0, icon: 'M12 2a10 10 0 100 20 10 10 0 000-20z' , color: 'text-sky-400' }, { id: 'javascript' ,
+                        name: 'JavaScript' , count: locals.articleCounts.javascript || 0,
+                        icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' , color: 'text-amber-400' } ]; %>
+
+                        <% categories.forEach(category=> { %>
+                            <a href="<%= category.id === 'all' ? '/' : '/category/' + category.id %>"
+                                class="dash-link <%= (locals.currentTag && (currentTag === category.id || (currentTag === 'programming' && category.id === 'all'))) || (!locals.currentTag && category.id === 'all') ? 'active' : '' %>">
+                                <svg class="w-4 h-4 <%= category.color %>" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="<%= category.icon %>"></path>
+                                </svg>
+                                <span class="flex-grow">
+                                    <%= category.name %>
                                 </span>
-                                <% }); %>
-                        </div>
-                    </div>
-                    <div class="p-6 flex-grow flex flex-col">
-                        <div class="flex items-center text-sm text-gray-300 mb-3">
-                            <span class="mr-2">
-                                <%= article.author %>
-                            </span> • <span class="ml-2">
-                                <%= article.date %>
-                            </span>
-                        </div>
-                        <!-- ... -->
-                        <a href="/article/<%= article.id %>">
-                            <h5
-                                class="mb-2 text-2xl font-bold tracking-tight text-white hover:text-blue-400 transition-colors">
-                                <%= article.title %>
-                            </h5>
+                                <span
+                                    class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-700/50 text-gray-300">
+                                    <%= category.count %>
+                                </span>
+                            </a>
+                            <% }); %>
+                </nav>
+
+                <% if (locals.user) { %>
+                    <div class="mt-4 pt-4 border-t border-slate-700/50">
+                        <p class="text-xs text-gray-500 uppercase tracking-widest mb-2 px-1">Quick Links</p>
+                        <a href="/favorites" class="dash-link">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            My Favorites
                         </a>
-                        <p class="mb-4 font-normal text-gray-300 flex-grow text-sm line-clamp-3">
-                            <%= article.summary %>
-                        </p>
-                        <a href="/article/<%= article.id %>"
-                            class="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors font-medium">
-                            Read Article
-                            <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
+                    </div>
+                    <% } %>
+            </div>
+        </aside>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <div class="main-content-area">
+            <!-- Mobile Category Scroll -->
+            <div class="lg:hidden mb-6 overflow-x-auto pb-4 scrollbar-hide">
+                <div class="flex space-x-2 min-w-max px-2">
+                    <% categories.forEach(category=> { %>
+                        <a href="<%= category.id === 'all' ? '/' : '/category/' + category.id %>"
+                            class="px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors <%= (locals.currentTag && (currentTag === category.id || (currentTag === 'programming' && category.id === 'all'))) ? 'bg-blue-600 text-white' : 'bg-slate-800 text-gray-300 border border-slate-700' %>">
+                            <%= category.name %>
+                        </a>
+                        <% }); %>
+                </div>
+            </div>
+
+            <!-- News Grid -->
+            <section>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-white">
+                        <%= locals.currentTag && currentTag !=='all' && currentTag !=='programming' ? title
+                            : 'Trending Now' %>
+                    </h2>
+                    <a href="/trends"
+                        class="text-blue-400 hover:text-blue-300 transition flex items-center text-sm">View all <span
+                            class="ml-1 text-lg">→</span></a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <% if (articles.length===0) { %>
+                        <div class="col-span-1 md:col-span-2 text-center py-12">
+                            <div
+                                class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-800 mb-4">
+                                <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                                    </path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-2">No articles found</h3>
+                            <p class="text-gray-400">We couldn't find any articles for this category. Please check back
+                                later or try a different category.</p>
+                            <a href="/" class="mt-4 inline-block text-blue-400 hover:text-white transition">Back to All
+                                News</a>
+                        </div>
+                        <% } else { %>
+                            <% articles.forEach(function(article, idx) { %>
+                                <div class="article-card glass-card rounded-2xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 flex flex-col relative"
+                                    style="animation-delay: <%= 2.3 + idx * 0.1 %>s;">
+                                    <div class="h-48 overflow-hidden relative group">
+                                        <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            src="<%= article.image %>" alt="<%= article.title %>">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent">
+                                        </div>
+                                        <div class="absolute bottom-3 left-3 flex space-x-2">
+                                            <% article.tags.forEach(function(tag) { %>
+                                                <span
+                                                    class="bg-blue-600/80 backdrop-blur-sm text-blue-100 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-500/30">
+                                                    <%= tag %>
+                                                </span>
+                                                <% }); %>
+                                        </div>
+                                    </div>
+                                    <div class="p-6 flex-grow flex flex-col">
+                                        <div class="flex items-center text-sm text-gray-300 mb-3">
+                                            <span class="mr-2">
+                                                <%= article.author %>
+                                            </span> •
+                                            <span class="ml-2">
+                                                <%= article.date %>
+                                            </span>
+                                        </div>
+                                        <a href="/article/<%= article.id %>">
+                                            <h5
+                                                class="mb-2 text-xl font-bold tracking-tight text-white hover:text-blue-400 transition-colors">
+                                                <%= article.title %>
+                                            </h5>
+                                        </a>
+                                        <p class="mb-4 font-normal text-gray-300 flex-grow text-sm line-clamp-3">
+                                            <%= article.summary %>
+                                        </p>
+                                        <a href="/article/<%= article.id %>"
+                                            class="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors font-medium">
+                                            Read Article
+                                            <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                                <path stroke="currentColor" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="2"
+                                                    d="M1 5h12m0 0L9 1m4 4L9 9" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                    <button
+                                        onclick="toggleFavorite('<%= article.id %>', '<%= Buffer.from(JSON.stringify(article)).toString('base64') %>')"
+                                        class="absolute top-3 right-3 p-2 rounded-full bg-slate-900/50 hover:bg-red-500/20 backdrop-blur-md transition-colors group/heart">
+                                        <svg id="heart-<%= article.id %>"
+                                            class="w-5 h-5 text-white group-hover/heart:text-red-500 transition-colors"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <% }); %>
+                                    <% } %>
+                </div>
+
+                <% if (!locals.user) { %>
+                    <!-- Login for More Articles Prompt -->
+                    <div class="mt-10 text-center p-8 bg-slate-900/50 rounded-2xl border border-slate-700">
+                        <h3 class="text-2xl font-bold text-white mb-3">Want more articles?</h3>
+                        <p class="text-gray-400 mb-6 max-w-2xl mx-auto">Login to unlock over 100+ curated articles,
+                            personalized recommendations, and community features.</p>
+                        <a href="/auth/login"
+                            class="inline-flex items-center px-6 py-3 text-base font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30">
+                            Login to View More
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1">
+                                </path>
                             </svg>
                         </a>
                     </div>
-                </div>
-                <% }); %>
+                    <% } %>
+
+                        <!-- Feedback Section -->
+                        <section class="mt-12 bg-slate-800/50 p-8 rounded-2xl border border-slate-700 text-center">
+                            <h2 class="text-2xl font-bold text-white mb-4">We value your feedback</h2>
+                            <p class="text-gray-400 mb-6">Help us improve DevNews by sharing your thoughts.</p>
+                            <% if (locals.feedbackSuccess) { %>
+                                <div class="bg-green-900/50 text-green-200 p-4 rounded mb-4 inline-block">Thank you for
+                                    your feedback!</div>
+                                <% } %>
+                                    <form action="/feedback" method="POST" class="max-w-lg mx-auto">
+                                        <textarea name="message" rows="3"
+                                            class="w-full bg-slate-900 text-white rounded-lg border border-slate-600 p-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none mb-4"
+                                            placeholder="Tell us what you think..." required></textarea>
+                                        <button type="submit"
+                                            class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-2 px-8 rounded-full hover:shadow-lg hover:shadow-blue-500/30 transition-all transform hover:-translate-y-1">Send
+                                            Feedback</button>
+                                    </form>
+                        </section>
+            </section>
         </div>
-        <!-- Feedback Section -->
-        <section class="mt-16 bg-slate-800/50 p-8 rounded-2xl border border-slate-700 text-center">
-            <h2 class="text-2xl font-bold text-white mb-4">We value your feedback</h2>
-            <p class="text-gray-400 mb-6">Help us improve DevNews by sharing your thoughts.</p>
+    </div>
 
-            <% if (locals.feedbackSuccess) { %>
-                <div class="bg-green-900/50 text-green-200 p-4 rounded mb-4 inline-block">Thank you for your feedback!
-                </div>
-                <% } %>
+    <!-- ===== SCRIPTS ===== -->
+    <script>
+        // ---- Sidebar controls ----
+        const sidebar = document.getElementById('dashboard-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const toggleBtn = document.getElementById('dashboard-toggle');
 
-                    <form action="/feedback" method="POST" class="max-w-lg mx-auto">
-                        <textarea name="message" rows="3"
-                            class="w-full bg-slate-900 text-white rounded-lg border border-slate-600 p-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none mb-4"
-                            placeholder="Tell us what you think..." required></textarea>
-                        <button type="submit"
-                            class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-2 px-8 rounded-full hover:shadow-lg hover:shadow-blue-500/30 transition-all transform hover:-translate-y-1">Send
-                            Feedback</button>
-                    </form>
-        </section>
+        function openSidebar() {
+            sidebar.classList.add('open');
+            overlay.classList.remove('hidden');
+            overlay.classList.add('visible');
+        }
 
-    </section>
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.classList.add('hidden');
+            overlay.classList.remove('visible');
+        }
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', openSidebar);
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeSidebar();
+        });
+
+        // ---- Favorites toggle ----
+        async function toggleFavorite(articleId, articleData) {
+            try {
+                const article = JSON.parse(atob(articleData));
+                const btn = document.querySelector(`button[onclick*="'${articleId}'"] svg`);
+                const response = await fetch('/favorites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ article })
+                });
+                const data = await response.json();
+                if (response.status === 401) { window.location.href = '/auth/login'; return; }
+                if (data.success) {
+                    if (data.isFavorite) {
+                        btn.classList.add('text-red-500', 'fill-current');
+                        btn.classList.remove('text-white');
+                    } else {
+                        btn.classList.remove('text-red-500', 'fill-current');
+                        btn.classList.add('text-white');
+                    }
+                }
+            } catch (error) { console.error('Error toggling favorite:', error); }
+        }
+
+        // ---- 🍌 Banana Canvas Entrance Animation ----
+        (function () {
+            const canvas = document.getElementById('banana-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const BANANA = '🍌';
+            const COUNT = 22;
+            let bananas = [];
+            let animFrame;
+
+            function rand(min, max) { return Math.random() * (max - min) + min; }
+
+            function createBanana() {
+                return {
+                    x: rand(0, canvas.width),
+                    y: rand(-200, -20),
+                    size: rand(28, 56),
+                    speedY: rand(3.5, 7),
+                    speedX: rand(-1.5, 1.5),
+                    rotation: rand(0, Math.PI * 2),
+                    rotSpeed: rand(-0.08, 0.08),
+                    opacity: 1,
+                    bounce: 0,
+                    bouncing: false
+                };
+            }
+
+            for (let i = 0; i < COUNT; i++) {
+                const b = createBanana();
+                b.y = rand(-600, 0); // stagger start
+                bananas.push(b);
+            }
+
+            let elapsed = 0;
+            function draw(timestamp) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                let allDone = true;
+                bananas.forEach(b => {
+                    if (b.opacity <= 0) return;
+                    allDone = false;
+
+                    b.y += b.speedY;
+                    b.x += b.speedX;
+                    b.rotation += b.rotSpeed;
+
+                    // Bounce at bottom
+                    if (b.y + b.size > canvas.height - 30) {
+                        b.y = canvas.height - 30 - b.size;
+                        b.bouncing = true;
+                        b.bounce++;
+                        b.speedY = -b.speedY * 0.45;
+                        if (Math.abs(b.speedY) < 0.8) {
+                            // Fade out after settling
+                            b.opacity -= 0.04;
+                            b.speedY = 0;
+                        }
+                    }
+
+                    // Fade out after ~2.5s in air for stragglers
+                    elapsed++;
+
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(0, b.opacity);
+                    ctx.translate(b.x + b.size / 2, b.y + b.size / 2);
+                    ctx.rotate(b.rotation);
+                    ctx.font = `${b.size}px serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(BANANA, 0, 0);
+                    ctx.restore();
+                });
+
+                // Fade out the whole overlay after bananas settle
+                const overlay = document.getElementById('banana-overlay');
+                if (allDone || elapsed > 420) {
+                    overlay.style.transition = 'opacity 0.5s';
+                    overlay.style.opacity = '0';
+                    setTimeout(() => { overlay.style.display = 'none'; }, 600);
+                    return;
+                }
+                animFrame = requestAnimationFrame(draw);
+            }
+
+            // Short delay before starting
+            setTimeout(() => { requestAnimationFrame(draw); }, 200);
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        })();
+    </script>
 
     <%- include('partials/footer') %>

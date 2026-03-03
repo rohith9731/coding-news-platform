@@ -51,21 +51,79 @@ const startServer = async () => {
     const reviewRoutes = require('./routes/reviews');
     const feedbackRoutes = require('./routes/feedback');
     const Review = require('./models/Review');
+    const User = require('./models/User');
 
     app.use('/auth', authRoutes);
     app.use('/article/:id/review', reviewRoutes);
     app.use('/feedback', feedbackRoutes);
 
+    app.get('/favorites', async (req, res) => {
+        if (!req.session.userId) return res.redirect('/auth/login');
+
+        try {
+            const user = await User.findById(req.session.userId);
+            res.render('trends', {
+                title: 'My Favorites',
+                articles: user.favorites || [],
+                // Passing a flag to potentially reuse trends view or create a specific favorites view
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).send('Error loading favorites');
+        }
+    });
+
+    app.post('/favorites', async (req, res) => {
+        if (!req.session.userId) return res.status(401).json({ success: false, message: 'Please login to save favorites' });
+
+        try {
+            const { article } = req.body; // Expect full article object or ID + details
+            const user = await User.findById(req.session.userId);
+
+            // Check if already favorites
+            const existingIndex = user.favorites.findIndex(fav => fav.id === article.id);
+
+            if (existingIndex > -1) {
+                // Remove
+                user.favorites.splice(existingIndex, 1);
+            } else {
+                // Add
+                user.favorites.push(article);
+            }
+
+            await user.save();
+            res.json({ success: true, isFavorite: existingIndex === -1 });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ success: false, message: 'Error updating favorites' });
+        }
+    });
+
+    // Article counts per category (static approximate counts for sidebar badges)
+    const CATEGORY_COUNTS = {
+        all: 30, 'machine-learning': 12, 'full-stack': 14, 'gen-ai': 18,
+        python: 16, webdev: 20, startups: 8, devops: 11, cloud: 9, react: 15, javascript: 22
+    };
+
     app.get('/', async (req, res) => {
-        const articles = await fetchNews();
+        const limit = req.session.userId ? 100 : 30;
+        const articles = await fetchNews('programming', limit);
         const feedbackSuccess = req.query.feedback === 'success';
-        res.render('index', { title: 'DevNews', articles: articles, feedbackSuccess });
+        res.render('index', { title: 'DevNews', articles, feedbackSuccess, currentTag: 'all', articleCounts: CATEGORY_COUNTS });
     });
 
     app.get('/trends', async (req, res) => {
-        // ideally fetch different news or sorted by popularity
-        const articles = await fetchNews();
-        res.render('trends', { title: 'Trending', articles: articles });
+        const limit = req.session.userId ? 100 : 30;
+        const articles = await fetchNews('programming', limit);
+        res.render('trends', { title: 'Trending', articles });
+    });
+
+    app.get('/category/:tag', async (req, res) => {
+        const tag = req.params.tag;
+        const limit = req.session.userId ? 100 : 30;
+        const articles = await fetchNews(tag, limit);
+        const title = tag.charAt(0).toUpperCase() + tag.slice(1) + ' News';
+        res.render('index', { title, articles, feedbackSuccess: false, currentTag: tag, articleCounts: CATEGORY_COUNTS });
     });
 
     app.get('/article/:id', async (req, res) => {

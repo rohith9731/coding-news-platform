@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    favorites: [{ type: Object }], // Array to store favored articles
     createdAt: {
         type: Date,
         default: Date.now

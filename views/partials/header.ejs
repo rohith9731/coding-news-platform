@@ -71,36 +71,54 @@
                 <ul
                     class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-transparent items-center">
                     <li>
+                        <button id="dashboard-toggle"
+                            class="py-2 px-3 text-gray-300 hover:text-white transition-colors flex items-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                            <span class="ml-2">Dashboard</span>
+                        </button>
+                    </li>
+                    <li>
                         <a href="/"
                             class="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-gray-300 md:hover:text-white md:p-0 transition-colors"
                             aria-current="page">Home</a>
                     </li>
-                    <li>
-                        <a href="/trends"
-                            class="block py-2 px-3 text-gray-300 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-white md:p-0 transition-colors">Trends</a>
-                    </li>
-                    <% if (user) { %>
+                    <% if (locals.user) { %>
                         <li>
-                            <div class="flex items-center gap-2 py-2 px-3 md:p-0 text-gray-300">
-                                <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                <span>
-                                    <%= user.username %>
-                                </span>
-                            </div>
-                        </li>
-                        <li>
-                            <a href="/auth/logout"
-                                class="block py-2 px-4 text-sm font-medium text-white bg-gray-800 hover:bg-gray-700 rounded-lg border border-gray-700 transition-colors">Logout</a>
+                            <a href="/favorites"
+                                class="block py-2 px-3 text-gray-300 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-white md:p-0 transition-colors">Favorites</a>
                         </li>
                         <% } else { %>
-                            <li class="flex gap-4">
-                                <a href="/auth/login"
-                                    class="py-2 px-4 text-sm font-medium text-gray-300 hover:text-white transition-colors">Login</a>
-                                <a href="/auth/register"
-                                    class="py-2 px-4 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-violet-600 rounded-lg hover:opacity-90 shadow-lg shadow-blue-500/20 transition-all">Get
-                                    Started</a>
+                            <li>
+                                <a href="/trends"
+                                    class="block py-2 px-3 text-gray-300 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-white md:p-0 transition-colors">Trends</a>
                             </li>
                             <% } %>
+                                <% if (user) { %>
+                                    <li>
+                                        <div class="flex items-center gap-2 py-2 px-3 md:p-0 text-gray-300">
+                                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                            <span>
+                                                <%= user.username %>
+                                            </span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="/auth/logout"
+                                            class="block py-2 px-4 text-sm font-medium text-white bg-gray-800 hover:bg-gray-700 rounded-lg border border-gray-700 transition-colors">Logout</a>
+                                    </li>
+                                    <% } else { %>
+                                        <li class="flex gap-4">
+                                            <a href="/auth/login"
+                                                class="py-2 px-4 text-sm font-medium text-gray-300 hover:text-white transition-colors">Login</a>
+                                            <a href="/auth/register"
+                                                class="py-2 px-4 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-violet-600 rounded-lg hover:opacity-90 shadow-lg shadow-blue-500/20 transition-all">Get
+                                                Started</a>
+                                        </li>
+                                        <% } %>
                 </ul>
             </div>
         </div>
