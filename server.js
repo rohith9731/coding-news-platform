@@ -28,7 +28,7 @@ const startServer = async () => {
 
     try {
         app.use(session({
-            secret: process.env.SESSION_SECRET,
+            secret: process.env.SESSION_SECRET || 'my_super_secret_fallback_key',
             resave: false,
             saveUninitialized: false,
             store: MongoStore.create({ mongoUrl: mongoUri })
